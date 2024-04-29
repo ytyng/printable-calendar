@@ -14,6 +14,9 @@ A4用紙にプリントできるシンプルなカレンダーです。
 
 [public/print-2024.pdf](docs/print-2024.pdf)
 
+## Depends on
+- Nuxt 3
+
 ## Setup
 
 ```bash
