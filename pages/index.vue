@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 const calendar = useCalendar()
 const route = useRoute()
+const router = useRouter()
 
 if (route.query.year) {
   calendar.year.value = Number(route.query.year)
@@ -10,11 +11,21 @@ const calendarHeaders = [
   '日', '月', '火', '水', '木', '金', '土'
 ]
 
+function yearChanged(event: Event) {
+  const target = event.target as HTMLInputElement
+  const year = Number(target.value)
+  calendar.year.value = year
+  router.push({ query: { year: year.toString() } })
+}
+
 </script>
 <template>
   <div>
     <div class="browser-header">
-      {{ calendar.year }}
+      <input :value="calendar.year.value"
+             @input="yearChanged"
+             class="year-input"
+      >
     </div>
     <div
       v-for="mc in calendar.getMonthlyCalendars()"
@@ -53,6 +64,14 @@ const calendarHeaders = [
 </template>
 
 <style scoped>
+.year-input {
+  background-color: #ccc;
+  border: none;
+  outline: none;
+  padding: 0.3em;
+  font-size: 16px;
+  border-radius: 0.3em;
+}
 .monthly-calendar {
   display: flex;
   flex-direction: column;
