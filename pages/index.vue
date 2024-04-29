@@ -6,6 +6,10 @@ if (route.query.year) {
   calendar.year.value = Number(route.query.year)
 }
 
+const calendarHeaders = [
+  '日', '月', '火', '水', '木', '金', '土'
+]
+
 </script>
 <template>
   <div>
@@ -23,7 +27,11 @@ if (route.query.year) {
       </div>
       <div class="calendar-table-wrapper">
         <table class="calendar-table">
-          <thead>
+          <thead v-if="calendarHeaders && calendarHeaders.length">
+          <tr>
+            <th v-for="(header, rowIndex) in calendarHeaders"
+                :key="`header-${rowIndex}`" :class="[`dow-${rowIndex}`]">{{ header }}</th>
+          </tr>
           </thead>
           <tbody>
           <tr
@@ -55,10 +63,13 @@ if (route.query.year) {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
     .month {
       font-size: 40mm;
+      line-height: 1;
       color: #666;
     }
+
     .year {
       font-size: 10mm;
       letter-spacing: 2mm;
@@ -75,12 +86,28 @@ if (route.query.year) {
     width: 100%;
     border-collapse: collapse;
     border-spacing: 0;
+    th {
+      padding: 2mm 0;
+      text-align: center;
+      border: solid #ccc;
+      border-width: 0.7mm 0.3mm;
 
+      color: #555;
+
+      &.dow-0 {
+        color: #cc5555;
+      }
+
+      &.dow-6 {
+        color: #5555cc;
+      }
+    }
     .day-cell {
       font-size: 10mm;
       padding: 10mm 0;
       text-align: center;
-      border: 0.1mm solid #ccc;
+      border: solid #ccc;
+      border-width: 0.7mm 0.3mm;
 
       &.dow-0 {
         color: #aa0000;
