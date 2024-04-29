@@ -15,7 +15,11 @@ function yearChanged(event: Event) {
   const target = event.target as HTMLInputElement
   const year = Number(target.value)
   calendar.year.value = year
-  router.push({ query: { year: year.toString() } })
+  router.push({query: {year: year.toString()}})
+}
+
+function print() {
+  window.print()
 }
 
 </script>
@@ -26,6 +30,7 @@ function yearChanged(event: Event) {
              @input="yearChanged"
              class="year-input"
       >
+      <button @click="print()" class="print-button">Print</button>
     </div>
     <div
       v-for="mc in calendar.getMonthlyCalendars()"
@@ -41,7 +46,8 @@ function yearChanged(event: Event) {
           <thead v-if="calendarHeaders && calendarHeaders.length">
           <tr>
             <th v-for="(header, rowIndex) in calendarHeaders"
-                :key="`header-${rowIndex}`" :class="[`dow-${rowIndex}`]">{{ header }}</th>
+                :key="`header-${rowIndex}`" :class="[`dow-${rowIndex}`]">{{ header }}
+            </th>
           </tr>
           </thead>
           <tbody>
@@ -72,6 +78,18 @@ function yearChanged(event: Event) {
   font-size: 16px;
   border-radius: 0.3em;
 }
+
+.print-button {
+  background: none;
+  border: none;
+  outline: none;
+  padding: 0.3em;
+  font-size: 16px;
+  margin-left: 1em;
+  color: #ddd;
+  cursor: pointer;
+}
+
 .monthly-calendar {
   display: flex;
   flex-direction: column;
@@ -105,6 +123,7 @@ function yearChanged(event: Event) {
     width: 100%;
     border-collapse: collapse;
     border-spacing: 0;
+
     th {
       padding: 2mm 0;
       text-align: center;
@@ -121,6 +140,7 @@ function yearChanged(event: Event) {
         color: #5555cc;
       }
     }
+
     .day-cell {
       font-size: 10mm;
       padding: 10mm 0;
