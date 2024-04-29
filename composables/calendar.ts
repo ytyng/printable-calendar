@@ -11,8 +11,12 @@ class CalendarCell {
     return this.date.toISOString()
   }
 
-  get day() {
+  get dateNumber() {
     return this.date.getDate()
+  }
+
+  get dayOfWeek() {
+    return this.date.getDay()
   }
 }
 
@@ -37,22 +41,23 @@ class MonthlyCalendar{
     const lastDay = lastDate.getDay()
     const lastDateNumber = lastDate.getDate()
 
-    const rows = []
-    let row = []
+    // 日付をcells にどんどん溜めていき、最後に7でチャンクする
+    const cells = []
+
     for (let i = 0; i < firstDay; i++) {
-      row.push(new CalendarCell(new Date(this.year, this.month - 1, -firstDay + i + 1), false))
+      cells.push(new CalendarCell(new Date(this.year, this.month - 1, -firstDay + i + 1), false))
     }
     for (let i = 1; i <= lastDateNumber; i++) {
-      row.push(new CalendarCell(new Date(this.year, this.month - 1, i), true))
-      if (row.length % 7 === 0) {
-        rows.push(row)
-        row = []
-      }
+      cells.push(new CalendarCell(new Date(this.year, this.month - 1, i), true))
     }
-    for (let i = 0; i < (6 - lastDay); i++) {
-      row.push(new CalendarCell(new Date(this.year, this.month, i + 1), false))
+    for (let i = 0; i < (6 - lastDay + 7); i++) {
+      cells.push(new CalendarCell(new Date(this.year, this.month, i + 1), false))
     }
-    rows.push(row)
+    // 7 でチャンクする
+    const rows = []
+    for (let i = 0; i < cells.length; i += 7) {
+      rows.push(cells.slice(i, i + 7))
+    }
     return rows
 
   }
