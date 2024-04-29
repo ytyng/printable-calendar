@@ -1,6 +1,10 @@
-# Nuxt 3 Minimal Starter
+# printable-calendar
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+A simple calendar that can be printed on A4 paper.
+
+A4用紙にプリントできるシンプルなカレンダーです。
+
+
 
 ## Setup
 
