@@ -19,6 +19,13 @@ on:
 permissions:
   contents: read
 
+# 本番デプロイ (main への push / 手動実行) は build から deploy まで直列化して、
+# 古い run が後から追い越して古い成果物を配らないようにする。
+# PR のテストはこのキューに並べない (並べると本番デプロイ待ちでキャンセルされる)。
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('pages-pr-{0}', github.ref) || 'pages' }}
+  cancel-in-progress: false
+
 jobs:
   # Test job (build の門番)
   test:
@@ -57,13 +64,6 @@ jobs:
   deploy:
     # Add a dependency to the build job
     needs: build
-    # Allow only one concurrent deployment, skipping runs queued between the run
-    # in-progress and latest queued. However, do NOT cancel in-progress runs as we
-    # want to allow these production deployments to complete.
-    # PR のテストまで直列化しないよう、workflow 全体ではなくこの job に付ける。
-    concurrency:
-      group: "pages"
-      cancel-in-progress: false
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
       pages: write      # to deploy to Pages
