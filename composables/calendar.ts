@@ -1,4 +1,4 @@
-class CalendarCell {
+export class CalendarCell {
   constructor(
     public date: Date,
     public isCurrentMonth: boolean,
@@ -21,7 +21,7 @@ class CalendarCell {
 }
 
 
-class MonthlyCalendar{
+export class MonthlyCalendar {
   constructor(
     public year: number,
     public month: number,
@@ -42,7 +42,7 @@ class MonthlyCalendar{
     const lastDateNumber = lastDate.getDate()
 
     // 日付をcells にどんどん溜めていき、最後に7でチャンクする
-    const cells = []
+    const cells: CalendarCell[] = []
 
     for (let i = 0; i < firstDay; i++) {
       cells.push(new CalendarCell(new Date(this.year, this.month - 1, -firstDay + i + 1), false))
@@ -50,11 +50,13 @@ class MonthlyCalendar{
     for (let i = 1; i <= lastDateNumber; i++) {
       cells.push(new CalendarCell(new Date(this.year, this.month - 1, i), true))
     }
-    for (let i = 0; i < (6 - lastDay + 7); i++) {
+    // 末尾は「土曜まで」を埋める。lastDay は 0 (日) 〜 6 (土) なので 6 - lastDay で足りる。
+    // ここに + 7 が入っていたため、どの月にも翌月だけの週が 1 行余分に出ていた。
+    for (let i = 0; i < 6 - lastDay; i++) {
       cells.push(new CalendarCell(new Date(this.year, this.month, i + 1), false))
     }
     // 7 でチャンクする
-    const rows = []
+    const rows: CalendarCell[][] = []
     for (let i = 0; i < cells.length; i += 7) {
       rows.push(cells.slice(i, i + 7))
     }

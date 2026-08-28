@@ -1,7 +1,7 @@
-# Sample workflow for building and deploying a Nuxt site to GitHub Pages
+# Nuxt のサイトをビルドして GitHub Pages へデプロイする。
 #
-# To get started with Nuxt see: https://nuxtjs.org/docs/get-started/installation
-#
+# ビルドの前に必ずユニットテストを通す。
+# 方針: https://github.com/cyberneura/cyberneura-github-actions/blob/main/docs/build-requires-tests.md
 name: Deploy Nuxt site to Pages
 
 on:
@@ -9,36 +9,47 @@ on:
   push:
     branches: ["main"]
 
+  # テストは PR でも走らせる (デプロイは main でのみ行う)
+  pull_request:
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+# 既定は読み取りのみ。Pages への書き込みは deploy job だけが持つ。
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 
 jobs:
-  # Build job
-  build:
+  # Test job (build の門番)
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm ci
+      - run: npm test
+
+  # Build job
+  build:
+    needs: test
+    # PR ではビルド成果物を作らない (テストだけ走らせる)
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       - run: corepack enable
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: "20"
       # Pick your own package manager and build script
-      - run: npm install
+      - run: npm ci
       - run: npx nuxt build --preset github_pages
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./.output/public
 
@@ -46,6 +57,13 @@ jobs:
   deploy:
     # Add a dependency to the build job
     needs: build
+    # Allow only one concurrent deployment, skipping runs queued between the run
+    # in-progress and latest queued. However, do NOT cancel in-progress runs as we
+    # want to allow these production deployments to complete.
+    # PR のテストまで直列化しないよう、workflow 全体ではなくこの job に付ける。
+    concurrency:
+      group: "pages"
+      cancel-in-progress: false
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
       pages: write      # to deploy to Pages
@@ -59,4 +77,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v4
